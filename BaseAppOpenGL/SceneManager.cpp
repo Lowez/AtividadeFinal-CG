@@ -15,7 +15,7 @@ CSceneManager::CSceneManager(int l, int a)
 	// Inicializa ponteiros das cenas	
 	// Cria a cena principal
 	this->Scene = NULL;
-	uiCurrentScene = 5;
+	uiCurrentScene = 7;
 	ChangeScene(uiCurrentScene);
 }
 
@@ -79,6 +79,10 @@ void CSceneManager::ChangeScene(unsigned int _uiCurrentScene)
 
 	case 6:
 		this->Scene = new CScene6();
+		break;
+
+	case 7:
+		this->Scene = new CScene7();
 		break;
 
 	}

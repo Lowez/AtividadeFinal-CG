@@ -71,6 +71,9 @@
     <ClCompile Include="Scene6.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="Scene7.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneBaseClass.h">
@@ -131,6 +134,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene6.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene7.h">
       <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>

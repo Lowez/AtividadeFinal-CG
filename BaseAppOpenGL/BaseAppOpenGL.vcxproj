@@ -106,6 +106,7 @@
     <ClCompile Include="Scene4.cpp" />
     <ClCompile Include="Scene5.cpp" />
     <ClCompile Include="Scene6.cpp" />
+    <ClCompile Include="Scene7.cpp" />
     <ClCompile Include="SceneBaseClass.cpp" />
     <ClCompile Include="SceneManager.cpp" />
   </ItemGroup>
@@ -127,6 +128,7 @@
     <ClInclude Include="Scene4.h" />
     <ClInclude Include="Scene5.h" />
     <ClInclude Include="Scene6.h" />
+    <ClInclude Include="Scene7.h" />
     <ClInclude Include="SceneBaseClass.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="VertexData.h" />

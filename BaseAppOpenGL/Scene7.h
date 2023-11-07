@@ -8,11 +8,11 @@
 #include "CModel_3DS.h"
 
 
-class CScene1 : public CSceneBaseClass
+class CScene7 : public CSceneBaseClass
 {
 public:
-	CScene1();
-	~CScene1(void);
+	CScene7();
+	~CScene7(void);
 
 	
 	virtual void MouseMove(void);					// Tratamento de movimento do mouse
