@@ -1,7 +1,7 @@
-#include "Scene1.h"
+#include "Scene7.h"
 
 
-CScene1::CScene1()
+CScene7::CScene7()
 {
 
 	pCamera = NULL;
@@ -35,12 +35,12 @@ CScene1::CScene1()
 	
 	// Carrega todas as texturas
 	pTextures = new CTexture();
-	pTextures->CreateTextureClamp(0, "../Scene1/back.bmp");
-	pTextures->CreateTextureClamp(1, "../Scene1/front.bmp");
-	pTextures->CreateTextureClamp(2, "../Scene1/down.bmp");
-	pTextures->CreateTextureClamp(3, "../Scene1/up.bmp");
-	pTextures->CreateTextureClamp(4, "../Scene1/left.bmp");
-	pTextures->CreateTextureClamp(5, "../Scene1/right.bmp");
+	pTextures->CreateTextureClamp(0, "../assets/skybox-left2.png");
+	pTextures->CreateTextureClamp(1, "../assets/skybox-centro.png");
+	pTextures->CreateTextureClamp(2, "../assets/skybox-bottom.png");
+	pTextures->CreateTextureClamp(3, "../assets/skybox-top.png");
+	pTextures->CreateTextureClamp(4, "../assets/skybox-right.png");
+	pTextures->CreateTextureClamp(5, "../assets/skybox-left.png");
 
 	pTextures->CreateTextureMipMap(6, "../Scene1/crate.bmp");
 	pTextures->CreateTextureMipMap(7, "../Scene1/grass.bmp");
@@ -76,7 +76,7 @@ CScene1::CScene1()
 }
 
 
-CScene1::~CScene1(void)
+CScene7::~CScene7(void)
 {
 	if (pTexto)
 	{
@@ -126,7 +126,7 @@ CScene1::~CScene1(void)
 
 
 
-int CScene1::DrawGLScene(void)	// Função que desenha a cena
+int CScene7::DrawGLScene(void)	// Função que desenha a cena
 {
 	// Get FPS
 	if (GetTickCount() - ulLastFPS >= 1000)	// When A Second Has Passed...
@@ -168,83 +168,6 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 	CreateSkyBox(0.0f, 100.0f, 0.0f,
 		1000.0f, 1000.0f, 1000.0f,
 		pTextures);
-	
-	
-	// Desenha casa
-	glPushMatrix();
-	glTranslatef(-25.0f, 0.0f, 20.0f);
-	pModel3DS_1->Draw();
-	glPopMatrix();
-
-	// Desenha castelo
-	glPushMatrix();
-	glScalef(1.5f, 1.5f, 1.5f);
-	pModel3DS_2->Draw();
-	glPopMatrix();
-
-	// Desenha gramado
-	glPushMatrix();
-	pModel3DS_3->Draw();
-	glPopMatrix();
-
-
-	// Desenha as árvores aplicando Blending.
-	// A operação é baseada no canal Alpha da textura .TGA
-	// glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.95f);
-
-	pTextures->ApplyTexture(9);
-	glPushMatrix();
-	glTranslatef(10.0f, 0.5f, 0.0f);
-	glBegin(GL_QUADS);
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-5.0, 0.0, 0.0);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f( 5.0, 0.0, 0.0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f( 5.0, 10.0, 0.0);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-5.0, 10.0, 0.0);
-
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0,  0.0,  5.0);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.0,  0.0, -5.0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0, 10.0, -5.0);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 10.0,  5.0);
-	glEnd();
-	glPopMatrix();
-
-	pTextures->ApplyTexture(10);
-	glPushMatrix();
-	glTranslatef(-10.0f, 0.5f, 10.0f);
-	glBegin(GL_QUADS);
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-5.0, 0.0, 0.0);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(5.0, 0.0, 0.0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(5.0, 10.0, 0.0);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-5.0, 10.0, 0.0);
-
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0, 0.0, 5.0);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.0, 0.0, -5.0);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0, 10.0, -5.0);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 10.0, 5.0);
-	glEnd();
-	glPopMatrix();
-
-	glDisable(GL_ALPHA_TEST);
-	glDisable(GL_BLEND);
-	//glEnable(GL_CULL_FACE);
-
-
-
-
-
-
-
-
-
-
-
-
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -302,7 +225,7 @@ int CScene1::DrawGLScene(void)	// Função que desenha a cena
 
 
 
-void CScene1::MouseMove(void) // Tratamento de movimento do mouse
+void CScene7::MouseMove(void) // Tratamento de movimento do mouse
 {
 	// Realiza os cálculos de rotação da visão do Player (através das coordenadas
 	// X do mouse.
@@ -324,7 +247,7 @@ void CScene1::MouseMove(void) // Tratamento de movimento do mouse
 	pCamera->rotateLoc(-fDeltaY, 1.0f, 0.0f, 0.0f);
 }
 
-void CScene1::KeyPressed(void) // Tratamento de teclas pressionadas
+void CScene7::KeyPressed(void) // Tratamento de teclas pressionadas
 {
 
 	// Verifica se a tecla 'W' foi pressionada e move o Player para frente
@@ -387,7 +310,7 @@ void CScene1::KeyPressed(void) // Tratamento de teclas pressionadas
 	}
 }
 
-void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
+void CScene7::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 {
 	switch (wParam)
 	{
@@ -411,7 +334,7 @@ void CScene1::KeyDownPressed(WPARAM	wParam) // Tratamento de teclas pressionadas
 }
 
 //	Cria um grid horizontal ao longo dos eixos X e Z
-void CScene1::Draw3DSGrid(float width, float length)
+void CScene7::Draw3DSGrid(float width, float length)
 {
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -436,7 +359,7 @@ void CScene1::Draw3DSGrid(float width, float length)
 }
 
 
-void CScene1::DrawCube(float pX, float pY, float pZ,
+void CScene7::DrawCube(float pX, float pY, float pZ,
 	float rX, float rY, float rZ, float angle,
 	float sX, float sY, float sZ,
 	int texID)
@@ -494,7 +417,7 @@ void CScene1::DrawCube(float pX, float pY, float pZ,
 }
 
 
-void CScene1::DrawAxis()
+void CScene7::DrawAxis()
 {
 	glPushMatrix();
 	glTranslatef(0.0f, 0.0f, 0.0f);
@@ -518,7 +441,7 @@ void CScene1::DrawAxis()
 }
 
 
-void CScene1::CreateSkyBox(float x, float y, float z,
+void CScene7::CreateSkyBox(float x, float y, float z,
 	float width, float height, float length,
 	CTexture* pTextures)
 {
