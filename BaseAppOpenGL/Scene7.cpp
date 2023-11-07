@@ -23,7 +23,7 @@ CScene7::CScene7()
 	pTexto = new CTexto();
 
 	// Cria camera
-	pCamera = new CCamera(0.0f, 1.0f, 20.0f, 0.1f);
+	pCamera = new CCamera(0.0f, 1.0f, 20.0f, 1.0f);
 
 	// Cria o Timer
 	pTimer = new CTimer();
@@ -35,12 +35,12 @@ CScene7::CScene7()
 	
 	// Carrega todas as texturas
 	pTextures = new CTexture();
-	pTextures->CreateTextureClamp(0, "../assets/skybox-left2.png");
-	pTextures->CreateTextureClamp(1, "../assets/skybox-centro.png");
-	pTextures->CreateTextureClamp(2, "../assets/skybox-bottom.png");
-	pTextures->CreateTextureClamp(3, "../assets/skybox-top.png");
-	pTextures->CreateTextureClamp(4, "../assets/skybox-right.png");
-	pTextures->CreateTextureClamp(5, "../assets/skybox-left.png");
+	pTextures->CreateTextureAnisotropic(0, "../assets/skybox-left2.png");
+	pTextures->CreateTextureAnisotropic(1, "../assets/skybox-centro.png");
+	pTextures->CreateTextureAnisotropic(2, "../assets/skybox-bottom.png");
+	pTextures->CreateTextureAnisotropic(3, "../assets/skybox-top.png");
+	pTextures->CreateTextureAnisotropic(4, "../assets/skybox-right.png");
+	pTextures->CreateTextureAnisotropic(5, "../assets/skybox-left.png");
 
 	pTextures->CreateTextureMipMap(6, "../Scene1/crate.bmp");
 	pTextures->CreateTextureMipMap(7, "../Scene1/grass.bmp");
