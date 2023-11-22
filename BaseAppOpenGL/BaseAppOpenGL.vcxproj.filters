@@ -74,6 +74,9 @@
     <ClCompile Include="Scene7.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="..\externals\Common\ogldev_basic_mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SceneBaseClass.h">
@@ -138,6 +141,9 @@
     </ClInclude>
     <ClInclude Include="Scene7.h">
       <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ogldev_basic_mesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

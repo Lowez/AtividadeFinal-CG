@@ -6,6 +6,10 @@
 #include "CTexto.h"
 #include "CCamera.h"
 #include "CModel_3DS.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "ogldev_basic_mesh.h"
 
 
 class CScene7 : public CSceneBaseClass
@@ -86,5 +90,14 @@ private:
 	CModel_3DS* pModel3DS_2;
 	CModel_3DS* pModel3DS_3;
 	
+	bool renderOnce;
+
+	unsigned int vertexShader;
+	unsigned int fragmentShader;
+	unsigned int shaderProgram;
+	unsigned int VAO;
+	unsigned int numVertices;
+
+	BasicMesh* pMesh;
 };
 

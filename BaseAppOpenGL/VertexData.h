@@ -2,7 +2,7 @@
 
 #define VERTICES 0
 #define INDICES 1
-#define NUM_BUFFERS 2
+//#define NUM_BUFFERS 2
 
 class CVector3
 {

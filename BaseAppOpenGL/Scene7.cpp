@@ -25,6 +25,11 @@ CScene7::CScene7()
 	// Cria camera
 	pCamera = new CCamera(0.0f, 1.0f, 20.0f, 1.0f);
 
+
+	pMesh = new BasicMesh();
+
+	pMesh->LoadMesh("../Content/spider.obj");
+
 	// Cria o Timer
 	pTimer = new CTimer();
 	pTimer->Init();
@@ -72,7 +77,26 @@ CScene7::CScene7()
 	pModel3DS_3 = new CModel_3DS();
 	pModel3DS_3->Load("../Scene1/Plane001.3DS");
 	
+	renderOnce = true;
 
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	// Anexe o código do vertex shader ao objeto shader e compile-o
+
+	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	// Anexe o código do fragment shader ao objeto shader e compile-o
+
+	unsigned int shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
+
+	unsigned int VAO;
+	glGenVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	unsigned int numVertices = 0;
+
+	pMesh = new BasicMesh();
 }
 
 
@@ -121,6 +145,10 @@ CScene7::~CScene7(void)
 		delete pModel3DS_3;
 		pModel3DS_3 = NULL;
 	}
+
+	if (pMesh) {
+		delete pMesh;
+	}
 }
 
 
@@ -146,6 +174,8 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	// Seta as posições da câmera
 	pCamera->setView();
 
+	return true;
+
 	// Desenha grid 
 	//Draw3DSGrid(20.0f, 20.0f);
 
@@ -158,18 +188,46 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//                               DESENHA OS OBJETOS DA CENA (INÍCIO)
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	float YRotationAngle = 1.0f;
+
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	// Habilita mapeamento de texturas 2D
 	glEnable(GL_TEXTURE_2D);
 
-	//if (loadModel("../assets/dead-tree/source/deadtreeV2.fbx")) {
-	// Desenha o SkyBox
-	CreateSkyBox(0.0f, 100.0f, 0.0f,
-	1000.0f, 1000.0f, 1000.0f,
-	pTextures);
-	//}
+	WorldTrans& worldTransform = pMesh->GetWorldTransform();
+
+	worldTransform.SetScale(0.01f);
+	worldTransform.SetPosition(0.0f, 0.0f, 2.0f);
+	worldTransform.Rotate(0.0f, YRotationAngle, 0.0f);
+
+	Matrix4f World = worldTransform.GetMatrix();
+
+	pMesh->Render();
+
+	glutPostRedisplay();
+
+	glutSwapBuffers();
+
+	renderOnce = true;
+
+	if (renderOnce) {
+		CreateSkyBox(0.0f, 100.0f, 0.0f,
+			1000.0f, 1000.0f, 1000.0f,
+			pTextures);
+
+		loadModel("../assets/low-poly-desk/source/DESK_LOW-POLY.glb");
+
+		glUseProgram(shaderProgram); // Use o shader necessário
+		glBindVertexArray(VAO); // Vincule o VAO do modelo
+
+		// Renderize o modelo
+		glDrawElements(GL_TRIANGLES, numVertices, GL_UNSIGNED_INT, 0);
+
+		renderOnce = false; // Altere o sinalizador após a renderização única
+	}
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -342,6 +400,7 @@ void CScene7::Draw3DSGrid(float width, float length)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glColor3f(0.0f, 0.3f, 0.0f);
 	glPushMatrix();
+
 	for (float i = -width; i <= length; i += 1)
 	{
 		for (float j = -width; j <= length; j += 1)
@@ -532,12 +591,28 @@ void CScene7::CreateSkyBox(float x, float y, float z,
 
 //bool CScene7::loadModel(const string& filePath) {
 //	Assimp::Importer importer;
-//	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
+//	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
+//	//const aiScene* scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality);
 //
 //	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 //		// Erro ao carregar o modelo
+//		importer.FreeScene();
 //		return false;
 //	}
 //
+//	// Percorrer os nós da cena (por exemplo, malhas)
+//	for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
+//		numVertices += scene->mMeshes[i]->mNumVertices;
+//		aiMesh* mesh = scene->mMeshes[i];
+//		// Processar o mesh (carregar vértices, índices, texturas, etc.)
+//	}
+//
+//	// Percorrer os materiais, se necessário
+//	for (unsigned int i = 0; i < scene->mNumMaterials; ++i) {
+//		aiMaterial* material = scene->mMaterials[i];
+//		// Processar materiais (texturas, cores, etc.)
+//	}
+//
+//	importer.FreeScene();
 //	return true;
 //}
