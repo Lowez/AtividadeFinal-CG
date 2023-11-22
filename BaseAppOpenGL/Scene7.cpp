@@ -35,12 +35,12 @@ CScene7::CScene7()
 	
 	// Carrega todas as texturas
 	pTextures = new CTexture();
-	pTextures->CreateTextureAnisotropic(0, "../assets/skybox-left2.png");
-	pTextures->CreateTextureAnisotropic(1, "../assets/skybox-centro.png");
-	pTextures->CreateTextureAnisotropic(2, "../assets/skybox-bottom.png");
-	pTextures->CreateTextureAnisotropic(3, "../assets/skybox-top.png");
-	pTextures->CreateTextureAnisotropic(4, "../assets/skybox-right.png");
-	pTextures->CreateTextureAnisotropic(5, "../assets/skybox-left.png");
+	pTextures->CreateTextureAnisotropic(0, "../assets/skybox2-right2.jpg");
+	pTextures->CreateTextureAnisotropic(1, "../assets/skybox2-front.jpg");
+	pTextures->CreateTextureAnisotropic(2, "../assets/skybox2-bottom.jpg");
+	pTextures->CreateTextureAnisotropic(3, "../assets/skybox2-top.jpg");
+	pTextures->CreateTextureAnisotropic(4, "../assets/skybox2-right.jpg");
+	pTextures->CreateTextureAnisotropic(5, "../assets/skybox2-left.jpg");
 
 	pTextures->CreateTextureMipMap(6, "../Scene1/crate.bmp");
 	pTextures->CreateTextureMipMap(7, "../Scene1/grass.bmp");
@@ -164,10 +164,12 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	// Habilita mapeamento de texturas 2D
 	glEnable(GL_TEXTURE_2D);
 
+	//if (loadModel("../assets/dead-tree/source/deadtreeV2.fbx")) {
 	// Desenha o SkyBox
 	CreateSkyBox(0.0f, 100.0f, 0.0f,
-		1000.0f, 1000.0f, 1000.0f,
-		pTextures);
+	1000.0f, 1000.0f, 1000.0f,
+	pTextures);
+	//}
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -527,3 +529,15 @@ void CScene7::CreateSkyBox(float x, float y, float z,
 
 	glPopMatrix();
 }
+
+//bool CScene7::loadModel(const string& filePath) {
+//	Assimp::Importer importer;
+//	const aiScene* scene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_FlipUVs);
+//
+//	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+//		// Erro ao carregar o modelo
+//		return false;
+//	}
+//
+//	return true;
+//}

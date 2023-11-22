@@ -32,6 +32,8 @@ public:
 		float width, float height, float length,
 		CTexture* pTextures);
 
+	bool loadModel(const string& filePath);
+
 private:
 	
 	bool	keys[256];		// Array usado para rotinas do teclado
