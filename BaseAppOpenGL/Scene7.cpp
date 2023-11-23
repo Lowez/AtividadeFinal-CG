@@ -62,7 +62,7 @@ CScene7::CScene7()
 
 	// Carrega Objetos da  Cena (casa)
 	pModel3DS_1 = new CModel_3DS();
-	pModel3DS_1->Load("../Scene1/House2.3DS");
+	pModel3DS_1->Load("../assets/dark-souls-bonfire/textures/bonfaire.3ds");
 
 	// Carrega Objetos da  Cena (muro)
 	pModel3DS_2 = new CModel_3DS();
@@ -170,6 +170,12 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	1000.0f, 1000.0f, 1000.0f,
 	pTextures);
 	//}
+	// 
+	// Desenha casa
+	glPushMatrix();
+	glTranslatef(-25.0f, 0.0f, 20.0f);
+	pModel3DS_1->Draw();
+	glPopMatrix();
 
 	glDisable(GL_TEXTURE_2D);
 
