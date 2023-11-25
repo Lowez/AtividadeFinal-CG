@@ -42,11 +42,12 @@ CScene7::CScene7()
 	pTextures->CreateTextureAnisotropic(4, "../assets/skybox2-right.jpg");
 	pTextures->CreateTextureAnisotropic(5, "../assets/skybox2-left.jpg");
 
-	pTextures->CreateTextureMipMap(6, "../Scene1/crate.bmp");
+	pTextures->CreateTextureAnisotropic(6, "../Scene7/stair.jpg");
 	pTextures->CreateTextureMipMap(7, "../Scene1/grass.bmp");
 
 	pTextures->CreateTextureTGA(9, "../Scene1/tree.tga");
 	pTextures->CreateTextureTGA(10, "../Scene1/tree2.tga");
+	pTextures->CreateTextureTGA(11, "../Scene1/grass.png");
 	
 
 	fPosX = 0.0f;
@@ -62,7 +63,7 @@ CScene7::CScene7()
 
 	// Carrega Objetos da  Cena (casa)
 	pModel3DS_1 = new CModel_3DS();
-	pModel3DS_1->Load("../assets/dark-souls-bonfire/textures/bonfaire.3ds");
+	pModel3DS_1->Load("../assets/dark-souls-bonfire/textures/mapa.3ds");
 
 	// Carrega Objetos da  Cena (muro)
 	pModel3DS_2 = new CModel_3DS();
@@ -71,8 +72,6 @@ CScene7::CScene7()
 	// Carrega Objetos da  Cena (gramado)
 	pModel3DS_3 = new CModel_3DS();
 	pModel3DS_3->Load("../Scene1/Plane001.3DS");
-	
-
 }
 
 
@@ -164,18 +163,56 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	// Habilita mapeamento de texturas 2D
 	glEnable(GL_TEXTURE_2D);
 
-	//if (loadModel("../assets/dead-tree/source/deadtreeV2.fbx")) {
 	// Desenha o SkyBox
 	CreateSkyBox(0.0f, 100.0f, 0.0f,
 	1000.0f, 1000.0f, 1000.0f,
 	pTextures);
-	//}
-	// 
-	// Desenha casa
+
+	/*
+		3DS Mapa
+	*/
 	glPushMatrix();
 	glTranslatef(-25.0f, 0.0f, 20.0f);
+
 	pModel3DS_1->Draw();
+
+	/*
+		Modelagem glVertex
+	*/
+
+	// Escadas da Árvore
+	DrawStairs(-50.0f, 3.0f, 20.0f, 0.0f, 1.0f, 0.0f, 90.0f, 20.0f, 0.5f, 1.0f);
+
+	// Escadas do Poço
+	DrawStairs(-3.0f, 5.0f, -38.0f, 0.0f, 1.0f, 0.0f, 15.0f, 10.0f, 1.0f, 2.0f);
+
+	/*
+		Blending: Gramas
+	*/
+
+	// Habilita Blending
+	glEnable(GL_BLEND);
+	// Configura função de Blending
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+	// Desenha Grama
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.5);
+	pTextures->ApplyTexture(11);
+
+	DrawGrasses();
+
+	glDisable(GL_ALPHA_TEST);
+
 	glPopMatrix();
+
+
+	// Desabilita Blending
+	glDisable(GL_BLEND);
+
+	
 
 	glDisable(GL_TEXTURE_2D);
 
@@ -228,6 +265,141 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	PerspectiveMode();
 
 	return true;
+}
+
+void CScene7::DrawStairs(float pX, float pY, float pZ,
+	float rX, float rY, float rZ, float angle, float sX, float sY, float sZ)
+{
+	glPushMatrix();
+	glTranslatef(pX, pY, pZ);
+	glRotatef(angle, rX, rY, rZ);
+	
+	DrawCube(sX, sY, sZ, 6);
+
+	glPushMatrix();
+	glTranslatef(0.0f, sY, -sZ);
+
+	DrawCube(sX - 2.0f, sY, sZ, 6);
+
+	glPushMatrix();
+	glTranslatef(0.0f, sY, -sZ);
+
+	DrawCube(sX - 3.0f, sY, sZ, 6);
+
+	glPushMatrix();
+	glTranslatef(0.0f, sY, -sZ);
+
+	DrawCube(sX - 4.0f, sY, sZ, 6);
+
+
+	glPopMatrix();
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void CScene7::DrawGrasses()
+{
+	vector<vector<float>> grassPos = {
+		{-9.0f, 4.5f, -37.0f},
+		{5.0f, 5.0f, -18.0f},
+		{7.0f, 5.0f, -18.0f},
+		{4.0f, 5.0f, -15.0f},
+		{7.0f, 5.0f, -8.0f},
+		{4.0f, 5.0f, -15.0f},
+
+		{-50.0f, 4.5f, 25.0f},
+		{-45.0f, 3.0f, 26.0f},
+		{-47.0f, 4.5f, 28.0f},
+	};
+
+	for (const auto& coords : grassPos) {
+		if (coords.size() < 3) {
+			// Certifique-se de que o vetor de coordenadas tem pelo menos 3 valores (x, y, z)
+			continue;
+		}
+
+		float x = coords[0];
+		float y = coords[1];
+		float z = coords[2];
+
+		glPushMatrix();
+		glTranslatef(x, y, z);
+		glScalef(0.3f, 0.3f, 0.3f);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-10.0f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(10.0f, 0.0f, 0.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(10.0f, 15.0f, 0.0f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-10.0f, 15.0f, 0.0f);
+
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0f, 0.0f, 10.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(0.0f, 0.0f, -10.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0f, 15.0f, -10.0f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0f, 15.0f, 10.0f);
+		glEnd();
+		glPopMatrix();
+	}
+}
+
+void CScene7::DrawCube(float sX, float sY, float sZ,
+	int texID)
+{
+
+	// Seta a textura ativa
+	if (texID >= 0) {
+		pTextures->ApplyTexture(texID);
+
+		// Configura a repetição da textura
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+
+	glPushMatrix();
+	//glTranslatef(pX, pY, pZ);
+	//glRotatef(angle, rX, rY, rZ);
+	glScalef(sX, sY, sZ);
+
+	glBegin(GL_QUADS);
+	// face frente
+	// face frente
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
+	glTexCoord2f(2.0f, 0.0f); glVertex3f(1.5f, -0.5f, 0.5f);
+	glTexCoord2f(2.0f, 2.0f); glVertex3f(1.5f, 0.5f, 0.5f);
+	glTexCoord2f(0.0f, 2.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
+
+	// face trás
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.5f, -0.5f, -0.5f);
+	glTexCoord2f(0.0f, 2.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
+	glTexCoord2f(2.0f, 2.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
+	glTexCoord2f(2.0f, 0.0f); glVertex3f(1.5f, 0.5f, -0.5f);
+
+	// face direita
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(1.5f, -0.5f, 0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(1.5f, -0.5f, -0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(1.5f, 0.5f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(1.5f, 0.5f, 0.5f);
+
+	// face esquerda
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
+
+	// face baixo
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
+	glTexCoord2f(0.0f, 2.0f); glVertex3f(1.5f, -0.5f, -0.5f);
+	glTexCoord2f(2.0f, 2.0f); glVertex3f(1.5f, -0.5f, 0.5f);
+	glTexCoord2f(2.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	// face cima
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
+	glTexCoord2f(0.0f, 2.0f); glVertex3f(1.5f, 0.5f, 0.5f);
+	glTexCoord2f(2.0f, 2.0f); glVertex3f(1.5f, 0.5f, -0.5f);
+	glTexCoord2f(2.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
+
+
+	glEnd();
+
+	glPopMatrix();
 }
 
 
@@ -364,64 +536,6 @@ void CScene7::Draw3DSGrid(float width, float length)
 	}
 	glPopMatrix();
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-
-void CScene7::DrawCube(float pX, float pY, float pZ,
-	float rX, float rY, float rZ, float angle,
-	float sX, float sY, float sZ,
-	int texID)
-{
-
-	// Seta a textura ativa
-	if (texID >= 0)
-		pTextures->ApplyTexture(texID);
-
-	glPushMatrix();
-	glTranslatef(pX, pY, pZ);
-	glRotatef(angle, rX, rY, rZ);
-	glScalef(sX, sY, sZ);
-
-	glBegin(GL_QUADS);
-	// face frente
-	glTexCoord2d(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
-	glTexCoord2d(1.0f, 0.0f); glVertex3f( 0.5f, -0.5f, 0.5f);
-	glTexCoord2d(1.0f, 1.0f); glVertex3f( 0.5f,  0.5f, 0.5f);
-	glTexCoord2d(0.0f, 1.0f); glVertex3f(-0.5f,  0.5f, 0.5f);
-
-	// face trás
-	glTexCoord2d(0.0f, 0.0f); glVertex3f(0.5f, -0.5f, -0.5f);
-	glTexCoord2d(0.0f, 1.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-	glTexCoord2d(1.0f, 1.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-	glTexCoord2d(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-	
-	// face direita
-	glTexCoord2d(0.0f, 0.0f); glVertex3f(0.5f, -0.5f, 0.5f);
-	glTexCoord2d(0.0f, 1.0f); glVertex3f(0.5f, -0.5f, -0.5f);
-	glTexCoord2d(1.0f, 1.0f); glVertex3f(0.5f, 0.5f, -0.5f);
-	glTexCoord2d(1.0f, 0.0f); glVertex3f(0.5f, 0.5f, 0.5f);
-
-	// face esquerda
-	glTexCoord2d(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-	glTexCoord2d(0.0f, 1.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
-	glTexCoord2d(1.0f, 1.0f); glVertex3f(-0.5f, 0.5f, 0.5f);
-	glTexCoord2d(1.0f, 0.0f); glVertex3f(-0.5f, 0.5f, -0.5f);
-
-	// face baixo
-	glTexCoord2d(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, -0.5f);
-	glTexCoord2d(0.0f, 1.0f); glVertex3f( 0.5f, -0.5f, -0.5f);
-	glTexCoord2d(1.0f, 1.0f); glVertex3f( 0.5f, -0.5f,  0.5f);
-	glTexCoord2d(1.0f, 0.0f); glVertex3f(-0.5f, -0.5f,  0.5f);
-
-	// face cima
-	glTexCoord2d(0.0f, 0.0f); glVertex3f(-0.5f,  0.5f,  0.5f);
-	glTexCoord2d(0.0f, 1.0f); glVertex3f( 0.5f,  0.5f,  0.5f);
-	glTexCoord2d(1.0f, 1.0f); glVertex3f( 0.5f,  0.5f, -0.5f);
-	glTexCoord2d(1.0f, 0.0f); glVertex3f(-0.5f,  0.5f,  -0.5f);
-
-	glEnd();
-
-	glPopMatrix();
 }
 
 

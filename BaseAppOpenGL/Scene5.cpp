@@ -36,7 +36,7 @@ CScene5::CScene5()
 	pTextures->CreateTextureClamp(4, "../Scene1/left.bmp");
 	pTextures->CreateTextureClamp(5, "../Scene1/right.bmp");
 	pTextures->CreateTextureLinear(6, "../Scene1/water.bmp");
-	pTextures->CreateTextureTGA(7, "../Scene1/tree3.tga");
+	pTextures->CreateTextureTGA(7, "../Scene1/tree1.tga");
 
 
 	// Carrega a casa

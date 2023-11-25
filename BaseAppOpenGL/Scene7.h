@@ -6,6 +6,7 @@
 #include "CTexto.h"
 #include "CCamera.h"
 #include "CModel_3DS.h"
+#include <vector>
 
 
 class CScene7 : public CSceneBaseClass
@@ -23,9 +24,12 @@ public:
 	void Draw3DSGrid(float width, float length);
 	void DrawAxis();
 
-	void DrawCube(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
+	/*void DrawCube(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
 		float rX = 0.0f, float rY = 0.0f, float rZ = 0.0f, float angle = 0.0f,
 		float sX = 1.0f, float sY = 1.0f, float sZ = 1.0f,
+		int texID = -1);*/
+
+	void DrawCube(float sX = 1.0f, float sY = 1.0f, float sZ = 1.0f,
 		int texID = -1);
 
 	void CreateSkyBox(float x, float y, float z,
@@ -33,6 +37,13 @@ public:
 		CTexture* pTextures);
 
 	bool loadModel(const string& filePath);
+
+	void DrawStairs(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
+		float rX = 0.0f, float rY = 0.0f, float rZ = 0.0f, float angle = 0.0f, float sX = 1.0f, float sY = 1.0f, float sZ = 1.0f);
+
+	void DrawGrasses();
+
+	vector<vector<float>> grassPos[10][3];
 
 private:
 	
