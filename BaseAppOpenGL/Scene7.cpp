@@ -72,6 +72,8 @@ CScene7::CScene7()
 	// Carrega Objetos da  Cena (gramado)
 	pModel3DS_3 = new CModel_3DS();
 	pModel3DS_3->Load("../Scene1/Plane001.3DS");
+
+	enabledFog = false;
 }
 
 
@@ -168,6 +170,27 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	1000.0f, 1000.0f, 1000.0f,
 	pTextures);
 
+	if (enabledFog) {
+
+		glEnable(GL_FOG);
+
+		// Define o tipo de névoa
+		glFogi(GL_FOG_MODE, GL_LINEAR); // GL_EXP, GL_EXP2 também são opções
+
+		// Define a cor da névoa (RGBA)
+		GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 0.2f }; // Cor cinza
+		glFogfv(GL_FOG_COLOR, fogColor);
+
+		// Define a distância inicial e final da névoa
+		glFogf(GL_FOG_START, 13.0f); // Distância inicial da névoa
+		glFogf(GL_FOG_END, 70.0f);   // Distância final da névoa
+		glFogi(GL_FOG_MODE, GL_LINEAR);
+		glHint(GL_FOG_HINT, GL_NICEST);
+
+		// Define a densidade da névoa (opcional)
+		glFogf(GL_FOG_DENSITY, 0.1f);
+	}
+
 	/*
 		3DS Mapa
 	*/
@@ -207,7 +230,6 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	glDisable(GL_ALPHA_TEST);
 
 	glPopMatrix();
-
 
 	// Desabilita Blending
 	glDisable(GL_BLEND);
@@ -459,8 +481,13 @@ void CScene7::KeyPressed(void) // Tratamento de teclas pressionadas
 		pCamera->moveGlob(0.0f, pCamera->Up[1], 0.0f);
 	}
 	// Senão, interrompe movimento do Player
-	else
+	else if (GetKeyState('F') & 0x80)
 	{
+		enabledFog = !enabledFog;
+
+		if (enabledFog == false) {
+			glDisable(GL_FOG);
+		}
 	}
 
 

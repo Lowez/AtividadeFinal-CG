@@ -97,5 +97,6 @@ private:
 	CModel_3DS* pModel3DS_2;
 	CModel_3DS* pModel3DS_3;
 	
+	bool enabledFog;
 };
 
