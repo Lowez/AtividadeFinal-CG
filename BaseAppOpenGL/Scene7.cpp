@@ -10,6 +10,7 @@ CScene7::CScene7()
 	pModel3DS_1 = NULL;
 	pModel3DS_2 = NULL;
 	pModel3DS_3 = NULL;
+	pShaderMgr = NULL;
 
 	bIsWireframe = false;
 	bIsCameraFPS = true;
@@ -23,7 +24,7 @@ CScene7::CScene7()
 	pTexto = new CTexto();
 
 	// Cria camera
-	pCamera = new CCamera(0.0f, 1.0f, 20.0f, 1.0f);
+	pCamera = new CCamera(25.23f, 21.02f, 2.25f, 1.0f);
 
 	// Cria o Timer
 	pTimer = new CTimer();
@@ -48,17 +49,9 @@ CScene7::CScene7()
 	pTextures->CreateTextureTGA(9, "../Scene1/tree.tga");
 	pTextures->CreateTextureTGA(10, "../Scene1/tree2.tga");
 	pTextures->CreateTextureTGA(11, "../Scene1/grass.png");
-	
 
-	fPosX = 0.0f;
-	fPosY = 10.0f;
-	fPosZ = 0.0f;
-	fMovementFactor = 0.1f;
-
-	// Cria esfera com coordenadas de textura
-	this->sphere1 = gluNewQuadric();
-	gluQuadricTexture(this->sphere1, TRUE);
-
+	pTextures->CreateTextureAnisotropic(12, "../Scene7/stair.jpg");
+	pTextures->CreateTextureAnisotropic(13, "../Scene7/summonj.jpg");
 
 
 	// Carrega Objetos da  Cena (casa)
@@ -72,8 +65,67 @@ CScene7::CScene7()
 	// Carrega Objetos da  Cena (gramado)
 	pModel3DS_3 = new CModel_3DS();
 	pModel3DS_3->Load("../Scene1/Plane001.3DS");
+	
+
+	fPosX = 0.0f;
+	fPosY = 10.0f;
+	fPosZ = 0.0f;
+	fMovementFactor = 0.1f;
+
+	// Cria esfera com coordenadas de textura
+	this->sphere1 = gluNewQuadric();
+	gluQuadricTexture(this->sphere1, TRUE);
+
+	// Carrega os Shader Programs
+	pShaderMgr = new CShaderManager();
+	pShaderMgr->InitShaderManager("../Scene2/SpotLightShader.vert", "../Scene2/SpotLightShader.frag");
+	bActiveShaderProgram = false;
+
+	LightAmbient[0] = 0.0f;		LightAmbient[1] = 0.0f;		LightAmbient[2] = 0.0f;	LightAmbient[3] = 1.0f;
+	LightDiffuse[0] = 1.0f;		LightDiffuse[1] = 1.0f;		LightDiffuse[2] = 1.0f;		LightDiffuse[3] = 1.0f;
+	LightSpecular[0] = 1.0f;	LightSpecular[1] = 1.0f;	LightSpecular[2] = 1.0f;	LightSpecular[3] = 1.0f;
+	LightPosition[0] = 0.0f;	LightPosition[1] = 20.0f;	LightPosition[2] = 0.0f;	LightPosition[3] = 1.0f;
+	LightDirection[0] = 0.0f;	LightDirection[1] = -1.0f;	LightDirection[2] = 0.0f;
+
+	MatAmbient[0] = 0.3f;	MatAmbient[1] = 0.3f;	MatAmbient[2] = 0.3f;	MatAmbient[3] = 1.0f;
+	MatDiffuse[0] = 0.5f;	MatDiffuse[1] = 0.5f;	MatDiffuse[2] = 0.5f;	MatDiffuse[3] = 1.0f;
+	MatSpecular[0] = 0.6f;	MatSpecular[1] = 0.6f;	MatSpecular[2] = 0.6f;	MatSpecular[3] = 1.0f;
+	MatShininess = 64.0f;
+
+
+
+	borda = 10.0f;
+	cutoff = 45.0f;
+	// Armazena posição da variável "interna"
+	uinterna = glGetUniformLocation(pShaderMgr->id(0), "interna");
+	// Inicializa o valor de cosborda
+	cosborda = cos((cutoff - borda) * GL_PI / 180.0f);
+
+	glShadeModel(GL_SMOOTH);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+	glClearDepth(1.0f);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	// Criando a SpotLight
+	glLightfv(GL_LIGHT0, GL_AMBIENT, LightAmbient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpecular);
+	glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, cutoff);
+	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, borda);
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, LightDirection);
+
+
+	// Aplicando Material 1 aos objetos
+	/*glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, MatAmbient);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, MatDiffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, MatSpecular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, MatShininess);*/
 
 	enabledFog = false;
+	enabledSpotlight = false;
 }
 
 
@@ -101,6 +153,12 @@ CScene7::~CScene7(void)
 	{
 		delete pTimer;
 		pTimer = NULL;
+	}
+
+	if (pShaderMgr)
+	{
+		delete pShaderMgr;
+		pShaderMgr = NULL;
 	}
 
 	gluDeleteQuadric(this->sphere1);
@@ -147,6 +205,7 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	// Seta as posições da câmera
 	pCamera->setView();
 
+
 	// Desenha grid 
 	//Draw3DSGrid(20.0f, 20.0f);
 
@@ -162,14 +221,43 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	
 	glColor3f(1.0f, 1.0f, 1.0f);
 
-	// Habilita mapeamento de texturas 2D
 	glEnable(GL_TEXTURE_2D);
+	// Habilita Blending
+	glEnable(GL_BLEND);
+	// Configura função de Blending
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Desenha o SkyBox
+
+	/*
+		SpotLight
+	*/
+	if (enabledSpotlight) {
+		glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, LightDirection);
+		glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+
+		//// Habilita iluminação
+		/*glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);*/
+
+
+		//// Ativa ou não o Shader Program (TRUE = Spotlight per Pixel | FALSE = Spotlight per Vertex)
+		if (bActiveShaderProgram == false)
+		{
+			pShaderMgr->bind(0);
+			glUniform1f(uinterna, cosborda); 	// E envia o valor atual da borda para o shader
+		}
+	}
+
+	/*
+		Skybox
+	*/
 	CreateSkyBox(0.0f, 100.0f, 0.0f,
 	1000.0f, 1000.0f, 1000.0f,
 	pTextures);
 
+	/*
+		Neblina
+	*/
 	if (enabledFog) {
 
 		glEnable(GL_FOG);
@@ -196,7 +284,9 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	*/
 	glPushMatrix();
 	glTranslatef(-25.0f, 0.0f, 20.0f);
+	glRotatef(90, 0.0f, 1.0f, 0.0f);
 
+	glNormal3f(0.0f, 0.0f, 1.0f);
 	pModel3DS_1->Draw();
 
 	/*
@@ -209,17 +299,14 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	// Escadas do Poço
 	DrawStairs(-3.0f, 5.0f, -38.0f, 0.0f, 1.0f, 0.0f, 15.0f, 10.0f, 1.0f, 2.0f);
 
+	// Escada Multi Textura
+	MultiTextureStair(-15.0f, 3.0f, 10.0f, 0.0f, 1.0f, 0.0f, 90.0f, 6);
+
 	/*
 		Blending: Gramas
 	*/
 
-	// Habilita Blending
-	glEnable(GL_BLEND);
-	// Configura função de Blending
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
-	// Desenha Grama
+	// Desenha Gramas
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5);
@@ -231,13 +318,14 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 
 	glPopMatrix();
 
-	// Desabilita Blending
 	glDisable(GL_BLEND);
-
-	
-
 	glDisable(GL_TEXTURE_2D);
 
+	// Desabilita o processamento de shaders dos objetos
+	if (bActiveShaderProgram == true)
+	{
+		pShaderMgr->unbind();
+	}
 
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -381,6 +469,8 @@ void CScene7::DrawCube(float sX, float sY, float sZ,
 	glScalef(sX, sY, sZ);
 
 	glBegin(GL_QUADS);
+
+	glNormal3f(0.0f, 0.0f, 1.0f);
 	// face frente
 	// face frente
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.5f, -0.5f, 0.5f);
@@ -424,7 +514,136 @@ void CScene7::DrawCube(float sX, float sY, float sZ,
 	glPopMatrix();
 }
 
+void CScene7::MultiTextureStair(float pX, float pY, float pZ,
+	float rX, float rY, float rZ, float angle,
+	int texID)
+{
+	// Seta a textura ativa
+	//if (texID >= 0) {
+	//	pTextures->ApplyTexture(texID);
 
+	//	// Configura a repetição da textura
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//}
+
+	// Unidade de Textura 0
+	glPushAttrib(GL_TEXTURE_BIT);
+	glActiveTexture(GL_TEXTURE0);
+	glEnable(GL_TEXTURE_2D);
+	pTextures->ApplyTexture(12);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
+
+	// Unidade de Textura 1
+	glActiveTexture(GL_TEXTURE1);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
+	pTextures->ApplyTexture(13);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_MODULATE);
+
+	//pTextures->ApplyTexture(6);
+
+	glPushMatrix();
+	glTranslatef(pX, pY, pZ);
+	glRotatef(angle, rX, rY, rZ);
+
+	glBegin(GL_QUADS);
+
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	// face frente
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 0.0f);
+	glVertex3f(15.0f, -0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 2.0f);
+	glVertex3f(15.0f, 0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 2.0f);
+	glVertex3f(-0.5f, 0.5f, 0.5f);
+
+	// face trás
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glVertex3f(15.0f, -0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 2.0f);
+	glVertex3f(-0.5f, -0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 2.0f);
+	glVertex3f(-0.5f, 0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 0.0f);
+	glVertex3f(15.0f, 0.5f, -4.5f);
+
+	// face direita
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glVertex3f(15.0f, -0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 1.0f);
+	glVertex3f(15.0f, -0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 1.0f, 1.0f);
+	glVertex3f(15.0f, 0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 1.0f, 0.0f);
+	glVertex3f(15.0f, 0.5f, 0.5f);
+
+
+	// face esquerda
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glVertex3f(-0.5f, -0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 1.0f, 0.0f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 1.0f, 1.0f);
+	glVertex3f(-0.5f, 0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 1.0f);
+	glVertex3f(-0.5f, 0.5f, -4.5f);
+
+	// face baixo
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glVertex3f(-0.5f, -0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 2.0f);
+	glVertex3f(15.0f, -0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 2.0f);
+	glVertex3f(15.0f, -0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 0.0f);
+	glVertex3f(-0.5f, -0.5f, 0.5f);
+
+	// face cima
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 2.0f);
+	glMultiTexCoord2f(GL_TEXTURE1, 0.0f, -1.0f);
+	glVertex3f(15.0f, 0.5f, 0.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 2.0f);
+	glMultiTexCoord2f(GL_TEXTURE1, -1.0f, -1.0f);
+	glVertex3f(15.0f, 0.5f, -4.5f);
+
+	glMultiTexCoord2f(GL_TEXTURE0, 2.0f, 0.0f);
+	glMultiTexCoord2f(GL_TEXTURE1, -1.0f, 0.0f);
+	glVertex3f(-0.5f, 0.5f, -4.5f);
+
+	glEnd();
+	glPopMatrix();
+
+	glActiveTexture(GL_TEXTURE1);
+	glDisable(GL_TEXTURE_2D);
+	glActiveTexture(GL_TEXTURE0);
+	glDisable(GL_TEXTURE_2D);
+	glPopAttrib();
+}
 
 
 void CScene7::MouseMove(void) // Tratamento de movimento do mouse
@@ -489,31 +708,48 @@ void CScene7::KeyPressed(void) // Tratamento de teclas pressionadas
 			glDisable(GL_FOG);
 		}
 	}
+	else if (GetKeyState('G') & 0x80)
+	{
+		enabledSpotlight = !enabledSpotlight;
+		if (enabledSpotlight == false) {
+			glDisable(GL_LIGHT0);
+			glDisable(GL_LIGHTING);
+		}
+		else {
+			glEnable(GL_LIGHTING);
+			glEnable(GL_LIGHT0);
+		}
+	}
+	else if (GetKeyState('R') & 0x80)
+	{
+		pCamera->Position[0] = 25.23f; 
+		pCamera->Position[1] = 21.02f;
+		pCamera->Position[2] = -2.25f;
+	}
 
-
-	if (GetKeyState(VK_UP) & 0x80)
+	if (GetKeyState(VK_UP) & 0x80 && enabledSpotlight)
 	{
-		fPosZ -= fMovementFactor;
+		LightPosition[2] -= 0.8f;
 	}
-	if (GetKeyState(VK_DOWN) & 0x80)
+	if (GetKeyState(VK_DOWN) & 0x80 && enabledSpotlight)
 	{
-		fPosZ += fMovementFactor;
+		LightPosition[2] += 0.8f;
 	}
-	if (GetKeyState(VK_LEFT) & 0x80)
+	if (GetKeyState(VK_LEFT) & 0x80 && enabledSpotlight)
 	{
-		fPosX -= fMovementFactor;
+		LightPosition[0] -= 0.8f;
 	}
-	if (GetKeyState(VK_RIGHT) & 0x80)
+	if (GetKeyState(VK_RIGHT) & 0x80 && enabledSpotlight)
 	{
-		fPosX += fMovementFactor;
+		LightPosition[0] += 0.8f;
 	}
-	if (GetKeyState(VK_PRIOR) & 0x80)
+	if (GetKeyState(VK_PRIOR) & 0x80 && enabledSpotlight)
 	{
-		fPosY += fMovementFactor;
+		LightPosition[1] += 0.8f;
 	}
-	if (GetKeyState(VK_NEXT) & 0x80)
+	if (GetKeyState(VK_NEXT) & 0x80 && enabledSpotlight)
 	{
-		fPosY -= fMovementFactor;
+		LightPosition[1] -= 0.8f;
 	}
 }
 

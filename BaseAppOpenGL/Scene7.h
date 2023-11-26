@@ -43,6 +43,10 @@ public:
 
 	void DrawGrasses();
 
+	void MultiTextureStair(float pX = 0.0f, float pY = 0.0f, float pZ = 0.0f,
+		float rX = 0.0f, float rY = 0.0f, float rZ = 0.0f, float angle = 0.0f,
+		int texID = -1);
+
 	vector<vector<float>> grassPos[10][3];
 
 private:
@@ -59,6 +63,7 @@ private:
 	CTexto			*pTexto;	// Objeto que gerencia texto
 	CTexture		*pTextures;	// Objeto que gerencia texturas
 	CTimer			*pTimer;	// Objeto que gerencia o timer
+	CShaderManager* pShaderMgr; // Objeto que gerencia os shaders
 
 
 	int		iFPS;			// FPS and FPS Counter
@@ -79,12 +84,28 @@ private:
 	GLfloat LightDiffuse[4];
 	GLfloat LightSpecular[4];
 	GLfloat LightPosition[4];
+	GLfloat LightDirection[3];
+	GLfloat LightDirectionCam[3];
 
 	// Definindo as propriedades do material
 	GLfloat MatAmbient[4];
 	GLfloat MatDiffuse[4];
 	GLfloat MatSpecular[4];
 	GLfloat MatShininess;
+
+	// Diferença angular entre a borda interna e externa do spot (em graus)
+	float borda;
+
+	// Borda externa do spot (em graus)
+	float cutoff;
+
+	// Cosseno da borda interna, para ser empregado no fragment shader
+	float cosborda;
+
+	// Handle para variável uniform "interna"
+	GLint uinterna;
+
+	bool bActiveShaderProgram;
 
 	float fPosX;
 	float fPosY;
@@ -98,5 +119,10 @@ private:
 	CModel_3DS* pModel3DS_3;
 	
 	bool enabledFog;
+	bool enabledSpotlight;
+
+	GLuint textureArray[1];
+
+
 };
 
