@@ -24,7 +24,7 @@ CScene7::CScene7()
 	pTexto = new CTexto();
 
 	// Cria camera
-	pCamera = new CCamera(25.23f, 21.02f, 2.25f, 1.0f);
+	pCamera = new CCamera(-39.23f, 119.02f, -16.25f, 1.0f);
 
 	// Cria o Timer
 	pTimer = new CTimer();
@@ -283,7 +283,7 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 		3DS Mapa
 	*/
 	glPushMatrix();
-	glTranslatef(-25.0f, 0.0f, 20.0f);
+	glTranslatef(-25.0f, 100.0f, 20.0f);
 	glRotatef(90, 0.0f, 1.0f, 0.0f);
 
 	glNormal3f(0.0f, 0.0f, 1.0f);
@@ -297,7 +297,7 @@ int CScene7::DrawGLScene(void)	// Função que desenha a cena
 	DrawStairs(-50.0f, 3.0f, 20.0f, 0.0f, 1.0f, 0.0f, 90.0f, 20.0f, 0.5f, 1.0f);
 
 	// Escadas do Poço
-	DrawStairs(-3.0f, 5.0f, -38.0f, 0.0f, 1.0f, 0.0f, 15.0f, 10.0f, 1.0f, 2.0f);
+	DrawStairs(-14.0f, 5.0f, -35.0f, 0.0f, 1.0f, 0.0f, 12.0f, 10.0f, 1.0f, 2.0f);
 
 	// Escada Multi Textura
 	MultiTextureStair(-15.0f, 3.0f, 10.0f, 0.0f, 1.0f, 0.0f, 90.0f, 6);
@@ -410,7 +410,7 @@ void CScene7::DrawStairs(float pX, float pY, float pZ,
 void CScene7::DrawGrasses()
 {
 	vector<vector<float>> grassPos = {
-		{-9.0f, 4.5f, -37.0f},
+		{-22.0f, 4.5f, -37.0f},
 		{5.0f, 5.0f, -18.0f},
 		{7.0f, 5.0f, -18.0f},
 		{4.0f, 5.0f, -15.0f},
@@ -722,9 +722,9 @@ void CScene7::KeyPressed(void) // Tratamento de teclas pressionadas
 	}
 	else if (GetKeyState('R') & 0x80)
 	{
-		pCamera->Position[0] = 25.23f; 
-		pCamera->Position[1] = 21.02f;
-		pCamera->Position[2] = -2.25f;
+		pCamera->Position[0] = -39.23f;
+		pCamera->Position[1] = 119.02f;
+		pCamera->Position[2] = -16.25f;
 	}
 
 	if (GetKeyState(VK_UP) & 0x80 && enabledSpotlight)
