@@ -84,7 +84,7 @@ CScene7::CScene7()
 	LightAmbient[0] = 0.0f;		LightAmbient[1] = 0.0f;		LightAmbient[2] = 0.0f;	LightAmbient[3] = 1.0f;
 	LightDiffuse[0] = 1.0f;		LightDiffuse[1] = 1.0f;		LightDiffuse[2] = 1.0f;		LightDiffuse[3] = 1.0f;
 	LightSpecular[0] = 1.0f;	LightSpecular[1] = 1.0f;	LightSpecular[2] = 1.0f;	LightSpecular[3] = 1.0f;
-	LightPosition[0] = 0.0f;	LightPosition[1] = 20.0f;	LightPosition[2] = 0.0f;	LightPosition[3] = 1.0f;
+	LightPosition[0] = -17.0f;	LightPosition[1] = 150.0f;	LightPosition[2] = 57.0f;	LightPosition[3] = 1.0f;
 	LightDirection[0] = 0.0f;	LightDirection[1] = -1.0f;	LightDirection[2] = 0.0f;
 
 	MatAmbient[0] = 0.3f;	MatAmbient[1] = 0.3f;	MatAmbient[2] = 0.3f;	MatAmbient[3] = 1.0f;
